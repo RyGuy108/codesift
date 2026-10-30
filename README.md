@@ -18,7 +18,7 @@ typical repo in well under a second.
 ## Quick start
 
 ```bash
-pip install git+https://github.com/<you>/codesift      # or: pip install -e . from this folder
+pip install git+https://github.com/RyGuy108/codesift      # or: pip install -e . from this folder
 
 cd your-repo
 codesift init --github --hook   # learns your style, writes .codesift.toml, a workflow, and a pre-commit hook
@@ -83,7 +83,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0   # required to diff against the PR base
-      - uses: <you>/codesift@v1
+      - uses: RyGuy108/codesift@v1
         with:
           fail-on: error     # error | warning | info | never
           suggest: "true"    # one-click fix suggestions in the PR review
@@ -122,7 +122,7 @@ Built-in hook: `codesift install-hook`. Or with the [pre-commit](https://pre-com
 
 ```yaml
 repos:
-  - repo: https://github.com/<you>/codesift
+  - repo: https://github.com/RyGuy108/codesift
     rev: v1.0.0
     hooks:
       - id: codesift        # or codesift-fix to auto-fix on commit

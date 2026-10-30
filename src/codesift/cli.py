@@ -320,7 +320,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install codesift
-        run: pip install "git+https://github.com/codesift/codesift@v1"
+        run: pip install "git+https://github.com/RyGuy108/codesift@v1"
       - name: Run codesift
         id: codesift
         run: codesift ci --suggest

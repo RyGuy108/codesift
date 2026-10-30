@@ -25,7 +25,7 @@ jobs:
         with:
           fetch-depth: 0   # lets codesift report only the lines a PR changes
 
-      - uses: ./        # in your repo: codesift/codesift@v1
+      - uses: ./        # in your repo: RyGuy108/codesift@v1
         with:
           fail-on: error
           suggest: "true"

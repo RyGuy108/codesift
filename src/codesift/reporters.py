@@ -14,7 +14,7 @@ from .models import Category, Finding, Severity
 from .rules import all_rules
 
 COMMENT_MARKER = "<!-- codesift-report -->"
-REPO_URL = "https://github.com/codesift/codesift"
+REPO_URL = "https://github.com/RyGuy108/codesift"
 
 # --------------------------------------------------------------------------
 # Text (terminal)
