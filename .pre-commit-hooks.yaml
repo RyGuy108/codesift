@@ -1,0 +1,15 @@
+- id: codesift
+  name: codesift
+  description: Find bugs, performance problems and style drift in staged files.
+  entry: codesift check --no-source
+  language: python
+  types_or: [python, javascript, ts, tsx, jsx, markdown, yaml, json, toml, shell]
+  require_serial: true
+
+- id: codesift-fix
+  name: codesift (auto-fix)
+  description: Apply codesift's safe automatic fixes to staged files.
+  entry: codesift check --fix --no-source
+  language: python
+  types_or: [python, javascript, ts, tsx, jsx, markdown, yaml, json, toml, shell]
+  require_serial: true

@@ -1,0 +1,31 @@
+# Example: use the codesift action in any repository.
+# Copy this file to .github/workflows/codesift.yml in your project
+# (or run `codesift init --github` to generate it).
+name: codesift
+
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+
+permissions:
+  contents: read
+  pull-requests: write     # sticky PR comment + one-click suggested fixes
+  security-events: write   # upload SARIF to Security → Code scanning
+
+concurrency:
+  group: codesift-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  codesift:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # lets codesift report only the lines a PR changes
+
+      - uses: ./        # in your repo: codesift/codesift@v1
+        with:
+          fail-on: error
+          suggest: "true"

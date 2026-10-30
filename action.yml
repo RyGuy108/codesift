@@ -1,0 +1,85 @@
+name: "codesift"
+description: "Find bugs, performance problems and style drift, with PR annotations, one-click fixes and Code Scanning."
+author: "codesift"
+branding:
+  icon: "search"
+  color: "purple"
+
+inputs:
+  scope:
+    description: "auto (changed lines on PRs, whole repo on push), changed, or all"
+    default: "auto"
+  fail-on:
+    description: "Lowest severity that fails the job: error, warning, info, or never"
+    default: "error"
+  comment:
+    description: "Sticky PR comment: always, on-issues (delete when clean), or never"
+    default: "on-issues"
+  suggest:
+    description: "Post one-click ```suggestion review comments for auto-fixable issues"
+    default: "true"
+  upload-sarif:
+    description: "Upload results to GitHub Code Scanning (needs security-events: write)"
+    default: "true"
+  args:
+    description: "Extra arguments for `codesift ci` (e.g. --disable G020)"
+    default: ""
+  python-version:
+    description: "Python used to run codesift"
+    default: "3.12"
+  github-token:
+    description: "Token for PR comments / suggestions"
+    default: ${{ github.token }}
+
+outputs:
+  total:
+    description: "Number of findings"
+    value: ${{ steps.run.outputs.total }}
+  errors:
+    description: "Number of error-level findings"
+    value: ${{ steps.run.outputs.errors }}
+  warnings:
+    description: "Number of warning-level findings"
+    value: ${{ steps.run.outputs.warnings }}
+  sarif:
+    description: "Path to the SARIF file"
+    value: ${{ steps.run.outputs.sarif }}
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Install codesift
+      shell: bash
+      run: python -m pip install --quiet "${{ github.action_path }}"
+
+    - name: Run codesift
+      id: run
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+      run: |
+        set +e
+        suggest=""
+        if [ "${{ inputs.suggest }}" = "true" ]; then suggest="--suggest"; fi
+        codesift ci --scope "${{ inputs.scope }}" --fail-on "${{ inputs.fail-on }}" \
+          --comment "${{ inputs.comment }}" $suggest ${{ inputs.args }}
+        echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+
+    - name: Upload SARIF to Code Scanning
+      if: always() && inputs.upload-sarif == 'true' && steps.run.outputs.sarif != ''
+      uses: github/codeql-action/upload-sarif@v3
+      continue-on-error: true   # private repos without GHAS can't upload; don't fail the job for that
+      with:
+        sarif_file: ${{ steps.run.outputs.sarif }}
+        category: codesift
+
+    - name: Enforce result
+      if: steps.run.outputs.exit_code != '0'
+      shell: bash
+      run: |
+        echo "codesift found issues at or above '${{ inputs.fail-on }}' severity."
+        exit ${{ steps.run.outputs.exit_code }}

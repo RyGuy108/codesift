@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "codesift"
+version = "1.0.0"
+description = "Find bugs, performance problems and style drift — locally, as a pre-commit hook, or in GitHub Actions."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = []
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Topic :: Software Development :: Quality Assurance",
+  "Environment :: Console",
+]
+
+[project.scripts]
+codesift = "codesift.cli:main"
+
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+# codesift dogfoods itself.
+[tool.codesift]
+max-line-length = 120
+indent-style = "space"
+indent-size = 4
+fail-on = "error"
+max-complexity = 30
+max-function-length = 120
+max-arguments = 8
+extend-exclude = ["examples/**"]
+
+[[tool.codesift.overrides]]
+paths = ["tests/**"]
+disable = ["PY021", "PY026", "G011"]
